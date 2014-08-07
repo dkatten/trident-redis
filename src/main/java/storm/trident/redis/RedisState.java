@@ -206,7 +206,11 @@ public class RedisState<T> implements IBackingMap<T> {
       for (List<Object> key : keys) {
          String strKey = keyFactory.build(key);
          byte[] bytes = keyValue.get(strKey.getBytes());
-         values.add(new String(bytes));
+         if (bytes == null) {
+           values.add(null);
+         } else {
+           values.add(new String(bytes));
+         }
       }
       return values;
    }
@@ -260,8 +264,9 @@ public class RedisState<T> implements IBackingMap<T> {
       } else {
          Jedis jedis = pool.getResource();
          try {
+           // Transaction T = jedis.multi();
             Pipeline pl = jedis.pipelined();
-            pl.multi();
+            // pl.multi();
 
             for (int i = 0; i < keys.size(); i++) {
                String val = new String(serializer.serialize(vals.get(i)));
