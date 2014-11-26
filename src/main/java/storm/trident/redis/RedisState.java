@@ -63,7 +63,7 @@ public class RedisState<T> implements IBackingMap<T> {
       public String globalKey = "$REDIS-MAP-STATE-GLOBAL";
       public Serializer<T> serializer = null;
       public KeyFactory keyFactory = null;
-      public int connectionTimeout = Protocol.DEFAULT_TIMEOUT;
+      public int connectionTimeout = Protocol.DEFAULT_TIMEOUT * 5;
       public String password = null;
       public int database = Protocol.DEFAULT_DATABASE;
       public String hkey = null;
