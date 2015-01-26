@@ -190,29 +190,16 @@ public class RedisState<T> implements IBackingMap<T> {
       if (keys.size() == 0) {
          return Collections.emptyList();
       }
+
+      String[] stringKeys = buildKeys(keys);
+
       if (Strings.isNullOrEmpty(this.options.hkey)) {
-         String[] stringKeys = buildKeys(keys);
          List<String> values = mget(stringKeys);
          return deserializeValues(keys, values);
       } else {
-         Map<byte[], byte[]> keyValue = hgetAll(this.options.hkey.getBytes());
-         List<String> values = buildValuesFromMap(keys, keyValue);
+         List<String> values = hmget(this.options.hkey, stringKeys);
          return deserializeValues(keys, values);
       }
-   }
-
-   private List<String> buildValuesFromMap(List<List<Object>> keys, Map<byte[], byte[]> keyValue) {
-      List<String> values = new ArrayList<String>(keys.size());
-      for (List<Object> key : keys) {
-         String strKey = keyFactory.build(key);
-         byte[] bytes = keyValue.get(strKey.getBytes());
-         if (bytes == null) {
-           values.add(null);
-         } else {
-           values.add(new String(bytes));
-         }
-      }
-      return values;
    }
 
    private List<T> deserializeValues(List<List<Object>> keys, List<String> values) {
@@ -251,6 +238,15 @@ public class RedisState<T> implements IBackingMap<T> {
       } finally {
          pool.returnResource(jedis);
       }
+   }
+
+   private List<String> hmget(String hashkey, String[] keys) {
+     Jedis jedis = pool.getResource();
+     try {
+       return jedis.hmget(hashkey, keys);
+     } finally {
+       pool.returnResource(jedis);
+     }
    }
 
    public void multiPut(List<List<Object>> keys, List<T> vals) {
