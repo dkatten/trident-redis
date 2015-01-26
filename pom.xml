@@ -57,7 +57,7 @@
         <dependency>
             <groupId>storm</groupId>
             <artifactId>storm</artifactId>
-            <version>0.9.0-rc2</version>
+            <version>0.9.0.1</version>
             <scope>compile</scope>
         </dependency>
 
